@@ -1,0 +1,2 @@
+# AiBlogGeneration
+for blog generation
