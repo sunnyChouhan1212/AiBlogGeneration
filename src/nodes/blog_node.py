@@ -2,35 +2,85 @@ from src.states.blogstate import BlogState
 
 class BlogNode:
     """
-    A class to represent he blog node
+    Blog workflow nodes for LangGraph.
     """
 
-    def __init__(self,llm):
-        self.llm=llm
+    def __init__(self, llm) -> None:
+        self.llm = llm
 
     
-    def title_creation(self,state:BlogState):
+    def title_creation(self,state:BlogState)-> dict:
         """
-        create the title for the blog
+        Generate SEO-friendly blog title.
         """
 
-        if "topic" in state and state["topic"]:
-            prompt="""
-                   You are an expert blog content writer. Use Markdown formatting. Generate
-                   a blog title for the {topic}. This title should be creative and SEO friendly
+        topic = state.get("topic", "").strip()
 
-                   """
+        if not topic:
+            raise ValueError("Topic is required for title generation.")
+
+        prompt = f"""
+            You are an expert blog content writer.
+
+            Use Markdown formatting.
+
+            Generate a creative and SEO-friendly blog title
+            for the following topic:
+
+            Topic: {topic}
+        """
             
-            sytem_message=prompt.format(topic=state["topic"])
-            print(sytem_message)
-            response=self.llm.invoke(sytem_message)
-            print(response)
-            return {"blog":{"title":response.content}}
+        sytem_message=prompt.format(topic=state["topic"])
+        print(sytem_message)
+        response=self.llm.invoke(sytem_message)
+        print(response)
+        return {
+            "blog": {
+                "title": response.content.strip(),
+            }
+        }
         
-    def content_generation(self,state:BlogState):
-        if "topic" in state and state["topic"]:
-            system_prompt = """You are expert blog writer. Use Markdown formatting.
-            Generate a detailed blog content with detailed breakdown for the {topic}"""
-            system_message = system_prompt.format(topic=state["topic"])
-            response = self.llm.invoke(system_message)
-            return {"blog": {"title": state['blog']['title'], "content": response.content}}
+    def content_generation(self,state:BlogState)-> dict:
+        """
+        Generate detailed blog content.
+        """
+
+        topic = state.get("topic", "").strip()
+
+        if not topic:
+            raise ValueError("Topic is required for content generation.")
+
+        blog = state.get("blog", {})
+        title = blog.get("title", "").strip()
+
+        if not title:
+            raise ValueError("Blog title is required.")
+
+        prompt = f"""
+        You are an expert blog writer.
+
+        Use Markdown formatting.
+
+        Generate a detailed, well-structured blog post
+        for the following topic.
+
+        Include:
+        - Introduction
+        - Key Concepts
+        - Examples
+        - Benefits
+        - Conclusion
+
+        Topic: {topic}
+
+        Blog Title: {title}
+        """
+
+        response = self.llm.invoke(prompt)
+
+        return {
+            "blog": {
+                "title": title,
+                "content": response.content.strip(),
+            }
+        }
