@@ -4,13 +4,16 @@ from src.states.blogstate import BlogState
 from src.nodes.blog_node import BlogNode
 
 class GraphBuilder:
+    """
+    Build and manage LangGraph workflows.
+    """
     def __init__(self,llm):
         self.llm=llm
         self.graph=StateGraph(BlogState)
 
     def build_topic_graph(self):
         """
-        Build a graph to generate blogss based on topic
+        Build blog generation workflow graph based on topic.
         """
         self.blog_node_obj=BlogNode(self.llm)
         print(self.llm)
@@ -26,6 +29,9 @@ class GraphBuilder:
         return self.graph
     
     def setup_graph(self,usecase):
+        """
+        Setup graph based on use case.
+        """
         if usecase=="topic":
             self.build_topic_graph()
 
