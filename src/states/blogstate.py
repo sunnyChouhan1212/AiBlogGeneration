@@ -1,11 +1,31 @@
 from typing import TypedDict
-from pydantic import BaseModel,Field
+
+from pydantic import BaseModel, Field
+
 
 class Blog(BaseModel):
-    title:str=Field(description="the title of the blog post")
-    content:str=Field(description="The main content of the blog post")
+    """
+    Blog response schema.
+    """
+
+    title: str = Field(
+        ...,
+        description="Title of the blog post",
+        example="Introduction to Agentic AI",
+    )
+
+    content: str = Field(
+        ...,
+        description="Main content of the blog post",
+        example="Agentic AI systems can reason and take actions...",
+    )
+
 
 class BlogState(TypedDict):
-    topic:str
-    blog:Blog
-    current_language:str
+    """
+    LangGraph state schema.
+    """
+
+    topic: str
+    blog: Blog
+    current_language: str
